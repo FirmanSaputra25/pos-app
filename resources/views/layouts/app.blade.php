@@ -11,11 +11,10 @@
     <!-- File CSS yang telah dikompilasi -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
     <title>POS System</title>
-</head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- Navbar dengan sticky-top -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">POS System</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -37,8 +36,12 @@
                     <li class="nav-item {{ Request::is('reports') ? 'active' : '' }}">
                         <a class="nav-link" href="#">Reports</a>
                     </li>
-
-                    <!-- Tombol Logout jika pengguna sudah login -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('cart.index') }}">
+                            Cart <span class="badge badge-pill badge-primary">{{ session('cart') ?
+                                count(session('cart')) : 0 }}</span>
+                        </a>
+                    </li>
                     <!-- Tombol Logout jika pengguna sudah login -->
                     @auth
                     <li class="nav-item">
@@ -83,15 +86,15 @@
     @endsection
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-3 mt-5">
+    {{-- <footer class="bg-dark text-white py-3 mt-5">
         <div class="container text-center">
-            <p>&copy; 2024 POS System. All Rights Reserved.</p>
+            <p>&copy; 2024 POS System. Firman Saputra.</p>
         </div>
-    </footer>
+    </footer> --}}
 
     <!-- JS Files -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ mix('js/app.js') }}"></script>
 </body>
 
 </html>

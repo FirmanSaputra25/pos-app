@@ -20,10 +20,22 @@ Route::get('/home', function () {
 
 Route::resource('products', ProductController::class);
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+// routes/web.php
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/{product}', [CartController::class, 'store'])->name('cart.store');
+Route::put('cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('cart/remove/{id}/', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('cart/remove/{id}/{size}', [CartController::class, 'remove']);
+
 Route::post('/cart/{productId}', [CartController::class, 'add'])->name('cart.add');
 
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+Route::post('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+
+Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+
+
 
 Route::post('payment', [PaymentController::class, 'store'])->name('payment.store');
 Route::get('/payment/create', [PaymentController::class, 'create'])->name('payment.create');

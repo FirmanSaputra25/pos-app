@@ -30,7 +30,10 @@ class Product extends Model
         return $this->hasMany(ProductSize::class, 'product_id'); // Menghubungkan produk dengan relasi ProductSize
     }
 
-
+    public function transactions()
+    {
+        return $this->belongsToMany(Transaction::class, 'transaction_product', 'product_id', 'transaction_id');
+    }
 
     // ProductSize.php
     public function product()
