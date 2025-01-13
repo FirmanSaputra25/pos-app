@@ -96,14 +96,14 @@ class ProductController extends Controller
 
 
 
-
-
-
     public function show($id)
     {
         $product = Product::findOrFail($id);
-        return view('products.show', compact('product'));
+        $productSizes = $product->productSizes; // Pastikan relasi ini sudah benar
+        return view('products.show', compact('product', 'productSizes'));
     }
+
+
 
     public function destroy(Product $product)
     {

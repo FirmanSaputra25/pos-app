@@ -15,7 +15,7 @@
     @endif
 
     <div class="row">
-        <!-- Pastikan $products ada dan memiliki data -->
+        <!-- Pastikan $products ada dan memiliki data -->`
         @foreach ($products as $product)
         <div class="col-md-4 product-item" data-name="{{ strtolower($product->name) }}">
             <div class="card mb-3">
