@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->json('products'); // Kolom JSON untuk menyimpan produk
             $table->decimal('total_price', 15, 2);
             $table->decimal('user_money', 15, 2);
             $table->enum('status', ['pending', 'paid', 'failed']);

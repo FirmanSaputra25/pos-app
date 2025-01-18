@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\ProductSize;
 use Illuminate\Http\Request;
+use PhpParser\JsonDecoder;
 
 class TransactionController extends Controller
 {
@@ -28,52 +29,48 @@ class TransactionController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi data
         $request->validate([
-            'cart' => 'required|array',
+            'cart' => 'required|string',
             'total_price' => 'required|numeric',
             'user_money' => 'required|numeric',
         ]);
-
-        // Ambil data dari request
-        $cart = $request->input('cart');
+        $cart = json_decode($request->input('cart'), true);
         $totalPrice = $request->input('total_price');
         $userMoney = $request->input('user_money');
-
-        // Simpan transaksi ke database
         $transaction = Transaction::create([
             'total_price' => $totalPrice,
             'user_money' => $userMoney,
+            'status' => 'paid'
         ]);
-
-        // Menambahkan produk dan ukuran produk ke transaksi
-        foreach ($cart as $cartItem) {
-            // Validasi produk dan ukuran produk
-            $product = Product::find($cartItem['product_id']);
-            $productSize = ProductSize::find($cartItem['product_size_id']);
-
-            if (!$product || !$productSize) {
-                // Jika produk atau ukuran produk tidak ditemukan, beri respons error
-                return back()->withErrors(['cart' => 'Invalid product or size selected.'])->withInput();
+        foreach ($cart as $productId => $sizes) {
+            $product = Product::find($productId);
+            if (!$product) {
+                return back()->withErrors(['cart' => 'Invalid product selected.'])->withInput();
             }
+            foreach ($sizes as $sizeId => $details) {
+                $productSize = ProductSize::find($sizeId);
+                if (!$productSize) {
+                    return back()->withErrors(['cart' => 'Invalid size selected.'])->withInput();
+                }
+                $quantity = (int) $details['quantity'];
+                if ($quantity > $productSize->stock) {
+                    return back()->withErrors(['cart' => 'Insufficient stock for product ' . $product->name . ' with size ' . $details['size'] . '.'])->withInput();
+                }
+                $transaction->products()->attach($product->id, [
+                    'product_size_id' => $productSize->id,
+                    'quantity' => $quantity,
 
-            $quantity = $cartItem['quantity'];
-
-            // Menambahkan data produk ke transaksi menggunakan pivot table
-            $transaction->products()->attach($product->id, [
-                'product_size_id' => $productSize->id,
-                'quantity' => $quantity,
-            ]);
+                ]);
+                $productSize->decrement('stock', $quantity);
+            }
         }
-
-        // Pass the transaction data to the view
+        $transaction = Transaction::find($transaction->id);
         return view('transactions.show', [
             'transaction' => $transaction,
             'cart' => $cart,
             'totalPrice' => $totalPrice,
-        ])->with('success', 'Transaction successfully created.');
+        ])->with('success', 'Transaction successfully created.');
     }
-
 
     public function show($transactionId)
     {
