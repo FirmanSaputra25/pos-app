@@ -64,17 +64,22 @@
         <input type="hidden" name="total_price" value="{{ $totalPrice }}">
         <input type="hidden" name="user_money" id="user_money_value" value="">
 
-        <button type="submit" class="btn btn-lg btn-success btn-block mt-4 py-3 shadow-sm"
-            style="font-size: 18px; transition: background-color 0.3s ease; border-radius: 30px;">
+        <button type="submit" id="submit-btn" class="btn btn-lg btn-success btn-block mt-4 py-3 shadow-sm"
+            style="font-size: 18px; transition: background-color 0.3s ease; border-radius: 30px;" disabled>
             Proceed to Payment
         </button>
     </form>
 
-
     <script>
-        document.getElementById('transaction-form').addEventListener('submit', function () {
+        document.getElementById('transaction-form').addEventListener('submit', function (e) {
             var userMoney = document.getElementById('user_money').value;
             document.getElementById('user_money_value').value = userMoney;
+
+            // Cek apakah uang cukup
+            if (parseFloat(userMoney) < {{ $totalPrice }}) {
+                e.preventDefault();  // Mencegah form disubmit
+                alert('Insufficient money to proceed with the transaction.');
+            }
         });
 
         // Menghitung total harga
@@ -84,13 +89,17 @@
         document.getElementById('user_money').addEventListener('input', function () {
             const userMoney = parseFloat(this.value) || 0;
             const messageElement = document.getElementById('message');
+            const submitButton = document.getElementById('submit-btn');
             
             if (userMoney < totalPrice) {
                 messageElement.innerHTML = `<div class="alert alert-warning fade show" role="alert" style="border-radius: 20px; background-color: #ffcc00;">You need Rp ${totalPrice - userMoney} more to complete the payment.</div>`;
+                submitButton.disabled = true;  // Nonaktifkan tombol submit
             } else if (userMoney > totalPrice) {
                 messageElement.innerHTML = `<div class="alert alert-success fade show" role="alert" style="border-radius: 20px; background-color: #28a745;">You have Rp ${userMoney - totalPrice} excess. Please check again.</div>`;
+                submitButton.disabled = false;  // Aktifkan tombol submit
             } else {
                 messageElement.innerHTML = `<div class="alert alert-success fade show" role="alert" style="border-radius: 20px; background-color: #28a745;">You have entered the correct amount. Proceed with payment.</div>`;
+                submitButton.disabled = false;  // Aktifkan tombol submit
             }
         });
     </script>

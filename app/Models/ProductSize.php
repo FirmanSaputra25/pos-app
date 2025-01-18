@@ -16,4 +16,8 @@ class ProductSize extends Model
     {
         return $this->hasMany(ProductSize::class);
     }
+    public function transactions()
+    {
+        return $this->belongsToMany(Transaction::class)->withPivot('quantity', 'price');
+    }
 }

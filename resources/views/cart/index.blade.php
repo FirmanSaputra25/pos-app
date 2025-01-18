@@ -53,12 +53,11 @@
                         <span>{{ $item['quantity'] }}</span>
                     </td>
                     <td>
-                        <!-- Gunakan $productId dan $sizeId untuk URL penghapusan -->
-                        <form action="{{ url('cart/remove/'.$productId.'/'.$sizeId) }}" method="GET"
-                            class="d-inline-block">
-                            @csrf
-                            <button type="submit" class="btn btn-danger btn-sm mt-2">Remove</button>
-                        </form>
+                        <!-- Tombol Remove dengan modal -->
+                        <button type="button" class="btn btn-danger btn-sm mt-2" data-bs-toggle="modal"
+                            data-bs-target="#removeModal-{{ $productId }}-{{ $sizeId }}">
+                            Remove
+                        </button>
                     </td>
                 </tr>
                 @endforeach
@@ -79,5 +78,33 @@
         </form>
     </div>
 </div>
+
+<!-- Modal Konfirmasi Remove untuk setiap item -->
+@foreach($cart as $productId => $sizes)
+@foreach($sizes as $sizeId => $item)
+<div class="modal fade" id="removeModal-{{ $productId }}-{{ $sizeId }}" tabindex="-1"
+    aria-labelledby="removeModalLabel-{{ $productId }}-{{ $sizeId }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeModalLabel-{{ $productId }}-{{ $sizeId }}">Confirm Remove Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to remove {{ $item['name'] }} (Size: {{ $item['size'] }}) from your cart? This
+                action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url('cart/remove/'.$productId.'/'.$sizeId) }}" method="GET">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">Yes, Remove</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endforeach
+@endforeach
 
 @endsection
