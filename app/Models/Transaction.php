@@ -8,7 +8,6 @@ class Transaction extends Model
 {
     // Kolom-kolom yang bisa di-mass assign
     protected $fillable = [
-        'products',
         'total_price',
         'user_money',
         'status',

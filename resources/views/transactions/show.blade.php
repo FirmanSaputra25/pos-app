@@ -6,11 +6,15 @@
 
     <!-- Menampilkan Produk yang Dibeli -->
     <h3 class="mt-3">Selected Products</h3>
-    @foreach (json_decode($transaction->cart, true) as $item)
+    @foreach ($cart as $item)
+    @foreach($item as $i)
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <span>{{ $item['name'] }} (x{{ $item['quantity'] }}) - Size: {{ $item['size'] }}</span>
-        <span>Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}</span>
+        <span>{{ $i['name'] }} (x{{ $i['quantity'] }}) - Size: {{ $i['size'] }}</span>
+        <span>Rp {{ number_format($i['price'] * $i['quantity'], 0, ',', '.') }}</span>
     </div>
+    @endforeach
+
+
     @endforeach
 
     <!-- Total Harga dan Uang yang Dimasukkan -->
