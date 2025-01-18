@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductSize;
 use Illuminate\Http\Request;
+use App\Models\Transaction;
 use Cart; // Pastikan ini diimpor untuk menggunakan Cart
 
 class CartController extends Controller
@@ -56,7 +57,39 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Product added to cart!');
     }
 
+    public function checkout()
+    {
+        // Mendapatkan data dari session atau request (seperti produk yang ada di keranjang)
+        $cart = session()->get('cart');
+        $totalPrice = 0;
+        $userMoney = 100000; // Contoh, ini bisa diambil dari input pengguna
 
+        // Hitung total harga dari produk yang ada di keranjang
+        foreach ($cart as $item) {
+            $totalPrice += $item['price'] * $item['quantity'];
+        }
+
+        // Membuat transaksi baru
+        $transaction = new Transaction();
+        $transaction->total_price = $totalPrice;
+        $transaction->user_money = $userMoney;
+        $transaction->status = 'completed'; // Status transaksi selesai
+        $transaction->save();
+
+        // Menyimpan produk yang dibeli
+        foreach ($cart as $productId => $item) {
+            $transaction->products()->attach($productId, [
+                'quantity' => $item['quantity'],
+                'price' => $item['price'],
+            ]);
+        }
+
+        // Hapus keranjang setelah transaksi selesai
+        session()->forget('cart');
+
+        // Redirect ke halaman sukses atau laporan
+        return redirect()->route('transactions.success');
+    }
 
 
 
@@ -101,7 +134,26 @@ class CartController extends Controller
         return redirect()->back()->with('error', 'Product not found in cart!');
     }
 
+    public function removeItem($productId, $sizeId)
+    {
+        // Ambil cart dari session
+        $cart = session()->get('cart', []);
 
+        // Cek apakah produk ada dalam cart
+        if (isset($cart[$productId])) {
+            // Cek apakah size ada dalam produk yang dipilih
+            if (isset($cart[$productId][$sizeId])) {
+                unset($cart[$productId][$sizeId]); // Hapus item berdasarkan size
+                if (empty($cart[$productId])) {
+                    unset($cart[$productId]); // Jika semua size produk sudah dihapus, hapus produk tersebut
+                }
+                session()->put('cart', $cart);
+                return redirect()->back()->with('success', 'Item removed successfully.');
+            }
+        }
+
+        return redirect()->back()->with('error', 'Item not found in cart.');
+    }
 
     public function remove($id, $size)
     {

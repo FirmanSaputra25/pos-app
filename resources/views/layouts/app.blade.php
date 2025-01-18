@@ -33,15 +33,21 @@
                     <li class="nav-item {{ Request::routeIs('transactions.index') ? 'active' : '' }}">
                         <a class="nav-link" href="{{ route('transactions.index') }}">Transactions</a>
                     </li>
-                    <li class="nav-item {{ Request::is('reports') ? 'active' : '' }}">
-                        <a class="nav-link" href="#">Reports</a>
+
+                    <!-- Cek apakah pengguna adalah admin -->
+                    @if(auth()->check() && auth()->user()->role === 'admin')
+                    <li class="nav-item {{ Request::is('sales-report') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('sales.report') }}">Reports</a>
                     </li>
+                    @endif
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('cart.index') }}">
                             Cart <span class="badge badge-pill badge-primary">{{ session('cart') ?
                                 count(session('cart')) : 0 }}</span>
                         </a>
                     </li>
+
                     <!-- Tombol Logout jika pengguna sudah login -->
                     @auth
                     <li class="nav-item">
@@ -65,6 +71,7 @@
             </div>
         </div>
     </nav>
+
 
     <!-- Container for Content -->
     <div class="container mt-5">

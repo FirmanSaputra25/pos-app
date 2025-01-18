@@ -22,27 +22,7 @@
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <img src="https://via.placeholder.com/150" class="card-img-top" alt="About Us">
-                <div class="card-body">
-                    <h5 class="card-title">About Us</h5>
-                    <p class="card-text">Learn more about our mission, vision, and values.</p>
-                    <a href="#" class="btn btn-primary">Learn More</a>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Contact Us">
-                <div class="card-body">
-                    <h5 class="card-title">Contact Us</h5>
-                    <p class="card-text">Need help? Get in touch with our support team.</p>
-                    <a href="#" class="btn btn-primary">Contact Now</a>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 @endsection

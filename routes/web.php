@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\ReportController;
 
 // Route utama yang akan menampilkan halaman login
 Route::get('/', function () {
@@ -17,7 +18,10 @@ Route::get('/', function () {
 Route::get('/home', function () {
     return view('home'); // Mengarah ke resources/views/home/home.blade.php
 })->name('home');
-
+// Route di web.php
+Route::post('end-transaction', [TransactionController::class, 'endTransaction'])->name('end.transaction');
+Route::get('/cart/remove/{productId}/{sizeId}', [CartController::class, 'removeItem'])->name('remove.item');
+Route::get('/sales-report', [ReportController::class, 'salesReport'])->name('sales.report');
 Route::resource('products', ProductController::class);
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 // routes/web.php

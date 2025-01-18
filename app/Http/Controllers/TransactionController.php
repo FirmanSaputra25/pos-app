@@ -15,16 +15,30 @@ class TransactionController extends Controller
         // Mengambil data produk dari cart yang ada di session
         $cart = session()->get('cart', []);
 
+        // Validasi: jika cart kosong, arahkan ke halaman yang sesuai dengan pesan error
+        if (empty($cart)) {
+            return redirect()->route('cart.index')->with('error', 'Your cart is empty. Please add some items.');
+        }
+
         // Menghitung total harga
         $totalPrice = array_reduce($cart, function ($total, $sizes) {
             return $total + array_reduce($sizes, function ($subTotal, $item) {
                 return $subTotal + ($item['price'] * $item['quantity']);
             }, 0);
         }, 0);
+
+        // Validasi: jika total harga 0, tampilkan error
+        if ($totalPrice == 0) {
+            return redirect()->route('cart.index')->with('error', 'Total price cannot be zero.');
+        }
+
+        // Mengambil semua produk (jika diperlukan untuk halaman transaksi)
         $products = Product::all();
 
+        // Menampilkan halaman dengan data cart dan total harga
         return view('transactions.index', compact('cart', 'products', 'totalPrice'));
     }
+
 
 
     public function store(Request $request)
@@ -59,7 +73,6 @@ class TransactionController extends Controller
                 $transaction->products()->attach($product->id, [
                     'product_size_id' => $productSize->id,
                     'quantity' => $quantity,
-
                 ]);
                 $productSize->decrement('stock', $quantity);
             }
@@ -70,6 +83,19 @@ class TransactionController extends Controller
             'cart' => $cart,
             'totalPrice' => $totalPrice,
         ])->with('success', 'Transaction successfully created.');
+    }
+    public function endTransaction(Request $request)
+    {
+        // Menghapus cart dari session atau database
+        session()->forget('cart'); // Jika cart disimpan dalam session
+
+        // Mengupdate status transaksi menjadi selesai atau kosong
+        $transaction = Transaction::findOrFail($request->transaction_id); // Sesuaikan dengan ID transaksi yang digunakan
+        $transaction->status = 'paid'; // Atau status lain yang sesuai
+        $transaction->save();
+
+        // Redirect ke halaman utama
+        return redirect('home')->with('success', 'Transaction Completed');
     }
 
     public function show($transactionId)

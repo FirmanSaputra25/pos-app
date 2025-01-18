@@ -14,11 +14,11 @@
     <a href="{{ route('products.create') }}" class="btn btn-success mb-3">Add Product</a>
     @endif
 
-    <div class="row">
-        <!-- Pastikan $products ada dan memiliki data -->`
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4">
+        <!-- Pastikan $products ada dan memiliki data -->
         @foreach ($products as $product)
-        <div class="col-md-4 product-item" data-name="{{ strtolower($product->name) }}">
-            <div class="card mb-3">
+        <div class="col mb-4">
+            <div class="card h-100">
                 <!-- Menampilkan gambar produk -->
                 @if ($product->image_path)
                 <img src="{{ asset('storage/products/' . $product->image_path) }}" class="card-img-top"
@@ -31,7 +31,6 @@
                     <h5 class="card-title">
                         <a href="{{ route('products.show', $product->id) }}">{{ $product->name }}</a>
                     </h5>
-                    <p class="card-text">Stock: {{ $product->stock }}</p>
 
                     <!-- Menampilkan ukuran produk -->
                     <p class="card-text">Sizes:
@@ -55,7 +54,6 @@
             </div>
         </div>
         @endforeach
-
     </div>
 
     {{ $products->links() }}
@@ -65,9 +63,9 @@
 <script>
     document.getElementById('search-input').addEventListener('input', function () {
         const query = this.value.toLowerCase();
-        const products = document.querySelectorAll('.product-item');
+        const products = document.querySelectorAll('.col');
         products.forEach(product => {
-            const name = product.getAttribute('data-name');
+            const name = product.querySelector('.card-title').textContent.toLowerCase();
             if (name.includes(query)) {
                 product.style.display = '';
             } else {
