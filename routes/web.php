@@ -9,6 +9,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ReportController;
+use App\Models\Product;
 
 // Route utama yang akan menampilkan halaman login
 Route::get('/', function () {
@@ -16,9 +17,11 @@ Route::get('/', function () {
 });
 
 Route::get('/home', function () {
-    return view('home'); // Mengarah ke resources/views/home/home.blade.php
+    $products = Product::all(); // Ambil semua produk dari database
+    return view('home', compact('products'));
 })->name('home');
 // Route di web.php
+
 Route::post('end-transaction', [TransactionController::class, 'endTransaction'])->name('end.transaction');
 Route::get('/cart/remove/{productId}/{sizeId}', [CartController::class, 'removeItem'])->name('remove.item');
 Route::get('/sales-report', [ReportController::class, 'salesReport'])->name('sales.report');
@@ -34,19 +37,16 @@ Route::get('cart/remove/{id}/{size}', [CartController::class, 'remove']);
 Route::post('/cart/{productId}', [CartController::class, 'add'])->name('cart.add');
 
 Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
-Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
-Route::post('/transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
-
+// Route untuk menyimpan transaksi baru
 Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
 
+// Route untuk menampilkan detail transaksi berdasarkan ID
+Route::get('transactions/{transactionId}', [TransactionController::class, 'show'])->name('transactions.show');
+Route::post('transactions/end', [TransactionController::class, 'endTransaction'])->name('end.transaction');
 
+// Route untuk menampilkan struk transaksi
+Route::get('transactions/{transactionId}/receipt', [TransactionController::class, 'showReceipt'])->name('transactions.receipt');
 
-Route::post('payment', [PaymentController::class, 'store'])->name('payment.store');
-Route::get('/payment/create', [PaymentController::class, 'create'])->name('payment.create');
-Route::post('/payment/create', [PaymentController::class, 'create'])->name('payment.create');
-Route::get('/payment/create', [PaymentController::class, 'showForm'])->name('payment.create');
-Route::post('/payment', [PaymentController::class, 'store'])->name('payment.store');
-Route::post('/payment-result', [PaymentController::class, 'result'])->name('payment.result');
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);

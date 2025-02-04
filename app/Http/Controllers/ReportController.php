@@ -9,11 +9,9 @@ use App\Models\Transaction;
 
 class ReportController extends Controller
 {
-    // Konstruktor untuk middleware
-
     public function salesReport()
     {
-        // Ambil semua transaksi dengan relasi produk
+        // Ambil semua transaksi beserta produk dan data pivot (quantity dan price)
         $transactions = Transaction::with('products')->get();
 
         // Hitung total pendapatan dari total_price setiap transaksi

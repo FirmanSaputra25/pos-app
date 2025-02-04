@@ -1,78 +1,79 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Product List</h1>
+<div class="ml-50 p-8 max-w-screen-lg mx-auto w-full overflow-hidden">
+    <h1 class="text-center text-2xl font-bold mb-4">Product List</h1>
 
     <!-- Kolom input pencarian -->
     <div class="mb-3">
-        <input type="text" id="search-input" class="form-control" placeholder="Search products...">
+        <input type="text" id="search-input" class="w-full p-2 border border-gray-300 rounded"
+            placeholder="Search products...">
     </div>
 
     @if (Auth::user()->role === 'admin')
     <!-- Tombol untuk menambah produk hanya untuk admin -->
-    <a href="{{ route('products.create') }}" class="btn btn-success mb-3">Add Product</a>
+    <a href="{{ route('products.create') }}" class="bg-green-500 text-white px-4 py-2 rounded mb-3 inline-block">Add
+        Product</a>
     @endif
 
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4">
-        <!-- Pastikan $products ada dan memiliki data -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @foreach ($products as $product)
-        <div class="col mb-4">
-            <div class="card h-100">
-                <!-- Menampilkan gambar produk -->
-                @if ($product->image_path)
-                <img src="{{ asset('storage/products/' . $product->image_path) }}" class="card-img-top"
-                    alt="{{ $product->name }}">
-                @else
-                <img src="{{ asset('images/default-product.png') }}" class="card-img-top" alt="default product image">
-                @endif
+        <div class="bg-white p-4 rounded shadow max-w-full">
+            <!-- Menampilkan gambar produk -->
+            @if($product->image_path)
+            <div class="w-64 h-64 overflow-hidden rounded-lg">
+                <img src="{{ asset('storage/images/' . $product->image_path) }}" class="w-full h-full object-cover"
+                    alt="Product Image">
+            </div>
+            @else
+            <p>No Image Available</p>
+            @endif
 
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="{{ route('products.show', $product->id) }}">{{ $product->name }}</a>
-                    </h5>
+            <div class="mt-4">
+                <h5 class="text-lg font-semibold">
+                    <a href="{{ route('products.show', $product->id) }}" class="text-blue-500 hover:underline">{{
+                        $product->name }}</a>
+                </h5>
 
-                    <!-- Menampilkan ukuran produk -->
-                    <p class="card-text">Sizes:
-                        @foreach ($product->productSizes as $productSize)
-                        {{ $productSize->size }} (Stock: {{ $productSize->stock }}){{ $loop->last ? '' : ', ' }}
-                        @endforeach
-                    </p>
+                <p class="text-gray-700">Sizes:
+                    @foreach ($product->productSizes as $productSize)
+                    {{ $productSize->size }} (Stock: {{ $productSize->stock }}){{ $loop->last ? '' : ', ' }}
+                    @endforeach
+                </p>
 
-                    <p class="card-text">Price: Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                <p class="text-gray-700 font-bold">Price: Rp {{ number_format($product->price, 0, ',', '.') }}</p>
 
-                    @if (Auth::user()->role === 'admin')
-                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning">Edit</a>
-                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline;">
+                @if (Auth::user()->role === 'admin')
+                <div class="flex space-x-2 mt-2">
+                    <a href="{{ route('products.edit', $product->id) }}"
+                        class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a>
+                    <form action="{{ route('products.destroy', $product->id) }}" method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete this product?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger"
-                            onclick="return confirm('Are you sure you want to delete this product?')">Delete</button>
+                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
                     </form>
-                    @endif
                 </div>
+                @endif
             </div>
         </div>
         @endforeach
     </div>
 
-    {{ $products->links() }}
+    <div class="mt-5">
+        {{ $products->links() }}
+    </div>
 </div>
 
 <!-- Script untuk Pencarian -->
 <script>
     document.getElementById('search-input').addEventListener('input', function () {
         const query = this.value.toLowerCase();
-        const products = document.querySelectorAll('.col');
+        const products = document.querySelectorAll('.grid > div');
         products.forEach(product => {
-            const name = product.querySelector('.card-title').textContent.toLowerCase();
-            if (name.includes(query)) {
-                product.style.display = '';
-            } else {
-                product.style.display = 'none';
-            }
+            const name = product.querySelector('h5 a').textContent.toLowerCase();
+            product.style.display = name.includes(query) ? '' : 'none';
         });
     });
 </script>
-
 @endsection

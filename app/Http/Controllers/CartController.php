@@ -26,12 +26,14 @@ class CartController extends Controller
         $productSize = ProductSize::find($sizeId);
 
         if (!$productSize) {
-            return redirect()->back()->with('error', 'Size not found!');
+            session()->flash('error', 'Size not found!');
+            return redirect()->back();
         }
 
         // Periksa apakah kuantitas yang diminta melebihi stok
         if ($request->quantity > $productSize->stock) {
-            return redirect()->back()->with('error', 'Not enough stock for the selected size!');
+            session()->flash('error', 'Not enough stock for the selected size!');
+            return redirect()->back();
         }
 
         // Cek apakah cart[$productId] sudah berupa array
@@ -54,8 +56,48 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
-        return redirect()->back()->with('success', 'Product added to cart!');
+
+        // Simpan pesan sukses
+        session()->flash('success', 'Product added to cart!');
+        return redirect()->back();
     }
+
+
+    public function addToCart(Request $request)
+    {
+        $productId = $request->input('product_id');
+        $sizeId = $request->input('size_id');
+        $quantity = $request->input('quantity');
+
+        // Ambil produk dan ukuran berdasarkan ID
+        $product = Product::find($productId);
+        $size = ProductSize::find($sizeId);
+
+        // Ambil cart dari session atau buat array kosong jika tidak ada
+        $cart = session()->get('cart', []);
+
+        // Periksa apakah produk sudah ada di cart
+        if (isset($cart[$productId][$sizeId])) {
+            $cart[$productId][$sizeId]['quantity'] += $quantity; // Jika ada, tambah kuantitas
+        } else {
+            // Jika tidak ada, tambahkan produk baru ke cart
+            $cart[$productId][$sizeId] = [
+                'name' => $product->name,
+                'size' => $size->size,
+                'price' => $size->price,
+                'quantity' => $quantity
+            ];
+        }
+
+        // Debug: Cek cart setelah ditambahkan produk
+        dd($cart);
+
+        // Simpan kembali cart ke session
+        session()->put('cart', $cart);
+
+        return redirect()->route('cart.index');
+    }
+
 
     public function checkout()
     {

@@ -1,32 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-5">
-    <h1 class="text-center text-primary mb-4 font-weight-bold">Transaction Details</h1>
+<div class="container mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+    <h1 class="text-center text-blue-600 text-2xl font-bold mb-6">Transaction Details</h1>
 
     <!-- Produk yang Dipilih -->
-    <div class="card shadow-sm mb-2">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Selected Products</h4>
-        </div>
-        <div class="card-body">
-            <table class="table table-hover">
+    <div class="bg-gray-100 p-4 rounded-lg shadow mb-4">
+        <h2 class="text-lg font-semibold text-blue-600">Selected Products</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse border border-gray-300 mt-3">
                 <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Size</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
+                    <tr class="bg-blue-500 text-white">
+                        <th class="p-2 border">Product Name</th>
+                        <th class="p-2 border">Size</th>
+                        <th class="p-2 border">Price</th>
+                        <th class="p-2 border">Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($cart as $productId => $sizes)
                     @foreach($sizes as $sizeId => $item)
-                    <tr>
-                        <td>{{ $item['name'] }}</td>
-                        <td>{{ $item['size'] }}</td>
-                        <td>Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
-                        <td>{{ $item['quantity'] }}</td>
+                    <tr class="text-center">
+                        <td class="p-2 border">{{ $item['name'] }}</td>
+                        <td class="p-2 border">{{ $item['size'] }}</td>
+                        <td class="p-2 border">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
+                        <td class="p-2 border">{{ $item['quantity'] }}</td>
                     </tr>
                     @endforeach
                     @endforeach
@@ -36,22 +34,16 @@
     </div>
 
     <!-- Total Harga -->
-    <div class="card shadow-sm mb-2">
-        <div class="card-body text-center">
-            <h4 class="text-muted">Total Price</h4>
-            <p class="h3 text-danger font-weight-bold">
-                Rp {{ number_format($totalPrice, 0, ',', '.') }}
-            </p>
-        </div>
+    <div class="bg-gray-100 p-4 rounded-lg shadow mb-4 text-center">
+        <h2 class="text-lg font-semibold text-gray-700">Total Price</h2>
+        <p class="text-2xl text-red-600 font-bold">Rp {{ number_format($totalPrice, 0, ',', '.') }}</p>
     </div>
 
     <!-- Input Uang Pengguna -->
-    <div class="card shadow-sm mb-2">
-        <div class="card-body">
-            <h4 class="text-muted">Enter Your Money</h4>
-            <input type="number" class="form-control shadow-sm rounded" id="user_money" name="user_money" required
-                placeholder="Enter your money" style="border-color: #00aaff;">
-        </div>
+    <div class="bg-gray-100 p-4 rounded-lg shadow mb-4">
+        <h2 class="text-lg font-semibold text-gray-700">Enter Your Money</h2>
+        <input type="number" id="user_money" name="user_money" required placeholder="Enter your money"
+            class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2">
     </div>
 
     <!-- Pesan jika ada kekurangan atau kelebihan -->
@@ -64,44 +56,42 @@
         <input type="hidden" name="total_price" value="{{ $totalPrice }}">
         <input type="hidden" name="user_money" id="user_money_value" value="">
 
-        <button type="submit" id="submit-btn" class="btn btn-lg btn-success btn-block mt-4 py-3 shadow-sm"
-            style="font-size: 18px; transition: background-color 0.3s ease; border-radius: 30px;" disabled>
+        <button type="submit" id="submit-btn"
+            class="w-full bg-green-500 text-white font-semibold py-3 rounded-lg shadow mt-4 transition duration-300 hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled>
             Proceed to Payment
         </button>
     </form>
 
-    <script>
-        document.getElementById('transaction-form').addEventListener('submit', function (e) {
-            var userMoney = document.getElementById('user_money').value;
-            document.getElementById('user_money_value').value = userMoney;
-
-            // Cek apakah uang cukup
-            if (parseFloat(userMoney) < {{ $totalPrice }}) {
-                e.preventDefault();  // Mencegah form disubmit
-                alert('Insufficient money to proceed with the transaction.');
-            }
-        });
-
-        // Menghitung total harga
-        const totalPrice = {{ $totalPrice }};
-        
-        // Menangani input uang dari pengguna
-        document.getElementById('user_money').addEventListener('input', function () {
-            const userMoney = parseFloat(this.value) || 0;
-            const messageElement = document.getElementById('message');
-            const submitButton = document.getElementById('submit-btn');
-            
-            if (userMoney < totalPrice) {
-                messageElement.innerHTML = `<div class="alert alert-warning fade show" role="alert" style="border-radius: 20px; background-color: #ffcc00;">You need Rp ${totalPrice - userMoney} more to complete the payment.</div>`;
-                submitButton.disabled = true;  // Nonaktifkan tombol submit
-            } else if (userMoney > totalPrice) {
-                messageElement.innerHTML = `<div class="alert alert-success fade show" role="alert" style="border-radius: 20px; background-color: #28a745;">You have Rp ${userMoney - totalPrice} excess. Please check again.</div>`;
-                submitButton.disabled = false;  // Aktifkan tombol submit
-            } else {
-                messageElement.innerHTML = `<div class="alert alert-success fade show" role="alert" style="border-radius: 20px; background-color: #28a745;">You have entered the correct amount. Proceed with payment.</div>`;
-                submitButton.disabled = false;  // Aktifkan tombol submit
-            }
-        });
-    </script>
 </div>
+
+<script>
+    document.getElementById('transaction-form').addEventListener('submit', function (e) {
+        var userMoney = document.getElementById('user_money').value;
+        document.getElementById('user_money_value').value = userMoney;
+
+        if (parseFloat(userMoney) < {{ $totalPrice }}) {
+            e.preventDefault();
+            alert('Insufficient money to proceed with the transaction.');
+        }
+    });
+
+    const totalPrice = {{ $totalPrice }};
+    document.getElementById('user_money').addEventListener('input', function () {
+        const userMoney = parseFloat(this.value) || 0;
+        const messageElement = document.getElementById('message');
+        const submitButton = document.getElementById('submit-btn');
+        
+        if (userMoney < totalPrice) {
+            messageElement.innerHTML = `<div class='p-3 rounded-lg bg-yellow-400 text-black text-center'>You need Rp ${totalPrice - userMoney} more to complete the payment.</div>`;
+            submitButton.disabled = true;
+        } else if (userMoney > totalPrice) {
+            messageElement.innerHTML = `<div class='p-3 rounded-lg bg-green-500 text-white text-center'>You have Rp ${userMoney - totalPrice} excess. Please check again.</div>`;
+            submitButton.disabled = false;
+        } else {
+            messageElement.innerHTML = `<div class='p-3 rounded-lg bg-green-500 text-white text-center'>You have entered the correct amount. Proceed with payment.</div>`;
+            submitButton.disabled = false;
+        }
+    });
+</script>
 @endsection

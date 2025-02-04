@@ -25,4 +25,8 @@ class Transaction extends Model
         return $this->belongsToMany(Product::class, 'transaction_product', 'transaction_id', 'product_id')
             ->withPivot('product_size_id', 'quantity', 'total_price'); // Jika perlu menyimpan size dan jumlah
     }
+    public function transactionItems()
+    {
+        return $this->hasMany(TransactionItem::class); // Pastikan model TransactionItem ada
+    }
 }
