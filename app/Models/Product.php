@@ -40,6 +40,10 @@ class Product extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function size()
+    {
+        return $this->belongsTo(ProductSize::class); // Pastikan ada model Size yang terkait
+    }
     // Pastikan relasi sudah benar di model Product
     public function sizes()
     {

@@ -26,8 +26,8 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
-            'sizes.*.size' => 'required|string', // Validasi untuk ukuran
-            'sizes.*.stock' => 'required|integer|min:1', // Validasi untuk stok
+            'sizes.*.size' => 'required|string',
+            'sizes.*.stock' => 'required|integer|min:1',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,bmp,tiff|max:2048',
         ]);
 
@@ -35,11 +35,16 @@ class ProductController extends Controller
         $product = new Product;
         $product->name = $request->name;
         $product->price = $request->price;
-        $product->stock = array_sum(array_column($request->sizes, 'stock')); // Total stok dari semua ukuran
+
+        // Hitung total stok
+        $product->stock = array_sum(array_column($request->sizes, 'stock'));
+
+        // Simpan gambar (jika ada)
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $product->image_path = $imagePath;
+            $imagePath = $request->file('image')->store('images', 'public');
+            $product->image_path = basename($imagePath); // Simpan hanya nama file
         }
+
         $product->save();
 
         // Simpan ukuran dan stok ke tabel product_sizes
@@ -54,7 +59,6 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Product added successfully!');
     }
-
     public function edit($id)
     {
         $product = Product::findOrFail($id);

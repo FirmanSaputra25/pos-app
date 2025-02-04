@@ -4,104 +4,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Menggunakan Bootstrap 5 dari CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Menggunakan FontAwesome untuk Ikon -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- File CSS yang telah dikompilasi -->
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+
     <title>POS System</title>
+</head>
 
-<body>
-    <!-- Navbar dengan sticky-top -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">POS System</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <!-- Menambahkan logika untuk menandai link yang aktif -->
-                    <li class="nav-item {{ Request::routeIs('home') ? 'active' : '' }}">
-                        <a href="{{ route('home') }}" class="nav-link">Home</a>
-                    </li>
-                    <li class="nav-item {{ Request::routeIs('products.index') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('products.index') }}">Products</a>
-                    </li>
-                    <li class="nav-item {{ Request::routeIs('transactions.index') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('transactions.index') }}">Transactions</a>
-                    </li>
+<body class="bg-gray-100 flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 h-screen text-white p-5 fixed">
+        <h1 class="text-2xl font-bold mb-6">POS System</h1>
+        <ul>
+            <li class="mb-4">
+                <a href="{{ route('home') }}"
+                    class="block py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('home') ? 'bg-gray-700' : '' }}">
+                    Home
+                </a>
+            </li>
+            <li class="mb-4">
+                <a href="{{ route('products.index') }}"
+                    class="block py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('products.index') ? 'bg-gray-700' : '' }}">
+                    Products
+                </a>
+            </li>
+            <li class="mb-4">
+                <a href="{{ route('transactions.index') }}"
+                    class="block py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('transactions.index') ? 'bg-gray-700' : '' }}">
+                    Transactions
+                </a>
+            </li>
+            @if(auth()->check() && auth()->user()->role === 'admin')
+            <li class="mb-4">
+                <a href="{{ route('sales.report') }}"
+                    class="block py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('sales.report') ? 'bg-gray-700' : '' }}">
+                    Reports
+                </a>
+            </li>
+            @endif
+            <li class="mb-4">
+                <a href="{{ route('cart.index') }}"
+                    class="block py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('cart.index') ? 'bg-gray-700' : '' }}">
+                    Cart
+                </a>
+            </li>
+            @auth
+            <li class="mb-4">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        class="block w-full text-left py-2 px-4 rounded hover:bg-red-600">Logout</button>
+                </form>
+            </li>
+            @endauth
+            @guest
+            <li class="mb-4">
+                <a href="{{ route('login') }}"
+                    class="block py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('login') ? 'bg-gray-700' : '' }}">
+                    Login
+                </a>
+            </li>
+            <li class="mb-4">
+                <a href="{{ route('register') }}"
+                    class="block py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('register') ? 'bg-gray-700' : '' }}">
+                    Register
+                </a>
+            </li>
+            @endguest
+        </ul>
+    </aside>
 
-                    <!-- Cek apakah pengguna adalah admin -->
-                    @if(auth()->check() && auth()->user()->role === 'admin')
-                    <li class="nav-item {{ Request::is('sales-report') ? 'active' : '' }}">
-                        <a class="nav-link" href="{{ route('sales.report') }}">Reports</a>
-                    </li>
-                    @endif
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('cart.index') }}">
-                            Cart <span class="badge badge-pill badge-primary">{{ session('cart') ?
-                                count(session('cart')) : 0 }}</span>
-                        </a>
-                    </li>
-
-                    <!-- Tombol Logout jika pengguna sudah login -->
-                    @auth
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-danger nav-link">Logout</button>
-                        </form>
-                    </li>
-                    @endauth
-
-                    <!-- Jika pengguna belum login, tampilkan login dan register -->
-                    @guest
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">Register</a>
-                    </li>
-                    @endguest
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-
-    <!-- Container for Content -->
-    <div class="container mt-5">
-        <!-- Welcome Section or Heading -->
-        <div class="row mb-4">
-        </div>
-
-        <!-- Content Section -->
+    <!-- Main Content -->
+    <main class="ml-64 p-10 w-full">
         @yield('content')
-    </div>
-
-    @section('styles')
-    <style>
-        .navbar-nav .nav-item.active .nav-link {
-            color: #007bff !important;
-            /* Biru */
-        }
-    </style>
-    @endsection
-
-    <!-- Footer -->
-    {{-- <footer class="bg-dark text-white py-3 mt-5">
-        <div class="container text-center">
-            <p>&copy; 2024 POS System. Firman Saputra.</p>
-        </div>
-    </footer> --}}
-
-    <!-- JS Files -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ mix('js/app.js') }}"></script>
+    </main>
 </body>
 
 </html>
