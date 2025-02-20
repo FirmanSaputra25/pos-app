@@ -32,7 +32,9 @@ class Product extends Model
 
     public function transactions()
     {
-        return $this->belongsToMany(Transaction::class, 'transaction_product', 'product_id', 'transaction_id');
+        return $this->belongsToMany(Transaction::class, 'transaction_items', 'product_id', 'transaction_id')
+            ->withPivot('quantity', 'price')
+            ->withTimestamps();
     }
 
     // ProductSize.php

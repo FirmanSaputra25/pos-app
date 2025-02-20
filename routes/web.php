@@ -10,6 +10,11 @@ use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ReportController;
 use App\Models\Product;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\SalesReportController;
+
+
+use App\Http\Middleware\RoleMiddleware;
 
 // Route utama yang akan menampilkan halaman login
 Route::get('/', function () {
@@ -22,9 +27,17 @@ Route::get('/home', function () {
 })->name('home');
 // Route di web.php
 
+
+
+Route::get('/import-excel', [ImportController::class, 'showImportForm'])->name('import.form');
+Route::post('/import-excel', [ImportController::class, 'import'])->name('import.excel');
+
+Route::get('/sales/export', [SalesReportController::class, 'export'])->name('sales.export');
+
 Route::post('end-transaction', [TransactionController::class, 'endTransaction'])->name('end.transaction');
 Route::get('/cart/remove/{productId}/{sizeId}', [CartController::class, 'removeItem'])->name('remove.item');
 Route::get('/sales-report', [ReportController::class, 'salesReport'])->name('sales.report');
+Route::get('/sales-report', [ReportController::class, 'index'])->name('sales.report');
 Route::resource('products', ProductController::class);
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 // routes/web.php

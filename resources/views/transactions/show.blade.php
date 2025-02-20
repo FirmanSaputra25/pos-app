@@ -30,16 +30,24 @@
             <div class="mb-4">
                 <label for="total_price" class="block text-sm font-medium">Total Price</label>
                 <input type="text" class="form-control block w-full px-3 py-2 border rounded-md bg-gray-100"
-                    id="total_price" name="total_price" value="Rp 
-                    {{ number_format($transaction->total_price, 0, ',', '.') }}" readonly>
+                    id="total_price" name="total_price"
+                    value="Rp {{ number_format($transaction->total_price, 0, ',', '.') }}" readonly>
             </div>
             <div class="mb-4">
                 <label for="user_money" class="block text-sm font-medium">User Money</label>
                 <input type="text" class="form-control block w-full px-3 py-2 border rounded-md bg-gray-100"
-                    id="user_money" name="user_money" value="Rp 
-                    {{ number_format($transaction->user_money, 0, ',', '.') }}" readonly>
+                    id="user_money" name="user_money"
+                    value="Rp {{ number_format($transaction->user_money, 0, ',', '.') }}" readonly>
+            </div>
+            <div class="mb-4">
+                <label for="change" class="block text-sm font-medium">Change</label>
+                <input type="text" class="form-control block w-full px-3 py-2 border rounded-md bg-gray-100" id="change"
+                    name="change"
+                    value="Rp {{ number_format($transaction->user_money - $transaction->total_price, 0, ',', '.') }}"
+                    readonly>
             </div>
         </div>
+
     </div>
 
     <!-- Progress Bar -->
@@ -53,41 +61,6 @@
     @endif
 
     <!-- End Transaction Button (Modal Trigger) -->
-
-
-    <!-- Modal for Transaction Confirmation -->
-    <div class="modal fade" id="endTransactionModal" tabindex="-1" aria-labelledby="endTransactionModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content bg-white rounded-lg shadow-lg">
-                <div class="modal-header border-b-2 border-gray-300 p-5">
-
-                    <h5 class="modal-title text-xl font-semibold" id="endTransactionModalLabel">Confirm End Transaction
-                    </h5>
-                    <button type="button" class="btn-close text-gray-500 hover:text-gray-700" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-5 text-lg text-gray-700">
-                    <p>Are you sure you want to complete this transaction? This action cannot be undone.</p>
-                </div>
-                <div class="modal-footer p-5 space-x-4">
-                    <button type="button"
-                        class="btn btn-secondary px-6 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-200"
-                        data-bs-dismiss="modal">Cancel</button>
-                    <form action="{{ route('end.transaction') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="transaction_id" value="{{ $transaction->id }}">
-                        <button type="submit"
-                            class="btn btn-danger bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600">Yes,
-                            End Transaction</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Menampilkan Status Pembayaran -->
     <div class="card shadow-lg mt-4">
         <div class="card-body text-center">
             @if ($transaction->status == 'pending')
@@ -109,6 +82,33 @@
         </div>
     </div>
 </div>
+<br>
+<!-- Modal for Transaction Confirmation -->
+<!-- Modal End Transaction -->
+<div class="modal fade" id="endTransactionModal" tabindex="-1" aria-labelledby="endTransactionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white rounded-lg shadow-lg">
+            <!-- Modal Footer -->
+            <div class="modal-footer p-5 flex justify-center">
+                <form action="{{ route('end.transaction') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="transaction_id" value="{{ $transaction->id }}">
+                    <button type="submit"
+                        class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600">
+                        Yes, View Receipt
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Menampilkan Status Pembayaran -->
+
 @endsection
 
 @push('styles')

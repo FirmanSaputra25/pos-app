@@ -13,12 +13,13 @@ class CreateTransactionItemsTable extends Migration
         Schema::create('transaction_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
-            $table->string('product_name');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade'); // Tambahkan ini
+            $table->foreignId('product_size_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
-            $table->decimal('price', 8, 2);
             $table->timestamps();
         });
     }
+
 
     public function down()
     {
