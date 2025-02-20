@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductSize extends Model
 {
-    protected $fillable = ['size', 'stock'];
+    protected $fillable = ['name', 'size', 'stock'];
 
     public function product()
     {
@@ -18,6 +18,6 @@ class ProductSize extends Model
     }
     public function transactions()
     {
-        return $this->belongsToMany(Transaction::class)->withPivot('quantity', 'price');
+        return $this->belongsToMany(Transaction::class, 'transaction_product')->withPivot('quantity', 'price');
     }
 }

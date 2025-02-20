@@ -61,11 +61,11 @@
 
                             <!-- Role -->
                             <div class="form-group">
-                                <label for="role">Role</label>
+                                {{-- <label for="role">Role</label>
                                 <select name="role" class="form-control" required>
-                                    <option value="user">User</option>
+                                    <option value="user">Kasir</option>
                                     <option value="admin">Admin</option>
-                                </select>
+                                </select> --}}
                                 @error('role')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror

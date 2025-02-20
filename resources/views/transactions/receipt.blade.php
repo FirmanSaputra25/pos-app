@@ -1,87 +1,88 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('content')
-<div class="container mt-5">
-    <h1 class="text-center mb-4 text-3xl font-bold">Payment Receipt</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #{{ $transaction->id }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Hide buttons when printing */
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
 
-    <!-- Menampilkan Produk yang Dibeli -->
-    <div class="card shadow-lg mb-4">
-        <div class="card-header bg-blue-500 text-white p-4 rounded-t-lg">
-            <h3 class="mb-0 text-xl font-semibold">Selected Products</h3>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <!-- Invoice Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Invoice</h1>
+                <p class="text-gray-500">Transaction ID: #{{ $transaction->id }}</p>
+                <p class="text-gray-500">Date: {{ $transaction->created_at->format('d-m-Y H:i') }}</p>
+            </div>
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg" alt="Company Logo"
+                    class="w-24">
+            </div>
         </div>
-        <div class="card-body p-4">
-            <table class="w-full border-collapse border border-gray-300 mt-3">
-                <thead>
-                    <tr class="bg-blue-500 text-white">
-                        <th class="p-2 border">Product Name</th>
-                        <th class="p-2 border">Size</th>
-                        <th class="p-2 border">Price</th>
-                        <th class="p-2 border">Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($items as $item)
-                    <tr class="text-center">
-                        <td class="p-2 border">{{ $item->product->name }}</td>
-                        <td class="p-2 border">{{ $item->productSize->size }}</td>
-                        <td class="p-2 border">Rp {{ number_format($item->product->price, 0, ',', '.') }}</td>
-                        <td class="p-2 border">{{ $item->quantity }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+
+        <!-- Product Details -->
+        <h3 class="text-lg font-semibold mt-6 mb-2">Product Details</h3>
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-800 text-white">
+                    <th class="border border-gray-300 px-4 py-2 text-left">Product</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Size</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Price</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Qty</th>
+                    <th class="border border-gray-300 px-4 py-2 text-left">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($items as $item)
+                <tr class="bg-gray-50">
+                    <td class="border border-gray-300 px-4 py-2">{{ $item->product->name }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ $item->productSize->size }}</td>
+                    <td class="border border-gray-300 px-4 py-2">Rp{{ number_format($item->product->price, 0, ',', '.')
+                        }}</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center">{{ $item->quantity }}</td>
+                    <td class="border border-gray-300 px-4 py-2">Rp{{ number_format($item->product->price *
+                        $item->quantity, 0, ',', '.') }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- Summary -->
+        <div class="bg-gray-50 p-4 rounded-lg text-right mt-4">
+            <p class="text-lg font-semibold text-gray-700">Total Price: <span class="text-gray-900">Rp{{
+                    number_format($transaction->total_price, 0, ',', '.') }}</span></p>
+            <p class="text-lg font-semibold text-gray-700">Customer Payment: <span class="text-gray-900">Rp{{
+                    number_format($transaction->user_money, 0, ',', '.') }}</span></p>
+            <p class="text-lg font-semibold text-green-600">Change: <span class="text-gray-900">Rp{{
+                    number_format($transaction->user_money - $transaction->total_price, 0, ',', '.') }}</span></p>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-sm text-gray-500">
+            <p>Thank you for shopping with us!</p>
+            <p>For support, contact <span class="font-semibold text-gray-700">support@example.com</span></p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-6 text-center no-print">
+            <button onclick="window.print()"
+                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none">Print
+                Invoice</button>
+            <a href="{{ route('home') }}"
+                class="bg-gray-500 text-white px-6 py-2 rounded-md ml-4 hover:bg-gray-600">Back to Home</a>
         </div>
     </div>
+</body>
 
-    <!-- Table of Products -->
-
-    <!-- Total Harga dan Uang yang Dimasukkan -->
-    <div class="card shadow-lg mb-4">
-        <div class="card-header bg-gray-700 text-white p-4 rounded-t-lg">
-            <h4 class="mb-0 text-lg font-semibold">Transaction Summary</h4>
-        </div>
-        <div class="card-body p-4">
-            <div class="mb-4">
-                <label for="total_price" class="block text-sm font-medium">Total Price</label>
-                <input type="text" class="form-control block w-full px-3 py-2 border rounded-md bg-gray-100"
-                    id="total_price" name="total_price" value="Rp 
-                    {{ number_format($transaction->total_price, 0, ',', '.') }}" readonly>
-            </div>
-            <div class="mb-4">
-                <label for="user_money" class="block text-sm font-medium">User Money</label>
-                <input type="text" class="form-control block w-full px-3 py-2 border rounded-md bg-gray-100"
-                    id="user_money" name="user_money" value="Rp 
-                    {{ number_format($transaction->user_money, 0, ',', '.') }}" readonly>
-            </div>
-        </div>
-    </div>
-
-    <!-- Status Pembayaran -->
-    <div class="card shadow-lg mt-4">
-        <div class="card-body text-center">
-            @if ($transaction->status == 'pending')
-            <div class="flex items-center justify-center bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow-md">
-                <i class="fas fa-clock text-xl mr-2"></i>
-                <span class="text-sm">Payment is still pending.</span>
-            </div>
-            @elseif ($transaction->status == 'paid')
-            <div class="flex items-center justify-center bg-green-100 text-green-800 p-4 rounded-lg shadow-md">
-                <i class="fas fa-check-circle text-xl mr-2"></i>
-                <span class="text-sm">Payment successfully completed.</span>
-            </div>
-            @else
-            <div class="flex items-center justify-center bg-red-100 text-red-800 p-4 rounded-lg shadow-md">
-                <i class="fas fa-times-circle text-xl mr-2"></i>
-                <span class="text-sm">Transaction failed. Please try again.</span>
-            </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Tombol untuk Kembali ke Daftar Transaksi atau Halaman Lain -->
-    <div class="text-center mt-5">
-        <a href="{{ route('transactions.index') }}" class="btn btn-primary px-6 py-2 rounded-md">Back to
-            Transactions</a>
-    </div>
-</div>
-@endsection
+</html>

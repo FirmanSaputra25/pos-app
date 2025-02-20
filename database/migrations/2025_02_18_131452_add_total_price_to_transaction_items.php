@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('kasir'); // Menambahkan kolom role dengan nilai default 'user'
+        Schema::table('transaction_items', function (Blueprint $table) {
+            $table->decimal('total_price', 10, 2);  // Menambahkan kolom total_price
         });
     }
 
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role'); // Menghapus kolom role
+        Schema::table('transaction_items', function (Blueprint $table) {
+            $table->dropColumn('total_price');
         });
     }
 };

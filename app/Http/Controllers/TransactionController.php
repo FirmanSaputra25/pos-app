@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\Transaction;
-use App\Models\ProductSize;
-use Illuminate\Http\Request;
 use App\Models\Cart;
+use App\Models\Product;
+use App\Models\ProductSize;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -78,19 +80,25 @@ class TransactionController extends Controller
                     return back()->withErrors(['cart' => 'Insufficient stock for product ' . $product->name . ' with size ' . $details['size'] . '.'])->withInput();
                 }
 
-                // Menambahkan item transaksi
-                $transaction->products()->attach($product->id, [
+                // Ambil total_price dari transaction jika ada
+                $transactionTotalPrice = DB::table('transactions')->where('id', $transaction->id)->value('total_price');
+
+                DB::table('transaction_product')->insert([
+                    'transaction_id' => $transaction->id,
+                    'product_id' => $product->id,
                     'product_size_id' => $productSize->id,
                     'quantity' => $quantity,
+                    'total_price' => $transactionTotalPrice ?? 0, // Gunakan total_price dari transaksi atau 0 jika null
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
+
 
                 // Mengurangi stok produk
                 $productSize->decrement('stock', $quantity);
             }
         }
 
-        // Menampilkan halaman transaksi dengan data yang telah disimpan
-        $transaction = Transaction::find($transaction->id);
         return view('transactions.show', [
             'transaction' => $transaction,
             'cart' => $cart,
