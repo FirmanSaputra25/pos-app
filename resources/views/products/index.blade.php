@@ -1,7 +1,121 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="ml-50 p-8 max-w-screen-lg mx-auto w-full overflow-hidden">
+<style>
+    /* Animasi Fade In */
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.8s ease-out;
+    }
+
+    /* Kontainer */
+    .container-custom {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Input Pencarian */
+    #search-input {
+        border-radius: 8px;
+        border: 2px solid #ccc;
+        transition: border-color 0.3s ease-in-out;
+    }
+
+    #search-input:focus {
+        border-color: #4f46e5;
+        outline: none;
+        box-shadow: 0px 0px 10px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Kartu Produk */
+    .product-card {
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Gambar Produk */
+    .product-image {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .product-image img {
+        transition: transform 0.3s ease;
+    }
+
+    .product-image:hover img {
+        transform: scale(1.1);
+    }
+
+    /* Tombol */
+    .btn {
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-green {
+        background: #22c55e;
+        color: white;
+    }
+
+    .btn-green:hover {
+        background: #16a34a;
+    }
+
+    .btn-yellow {
+        background: #facc15;
+        color: black;
+    }
+
+    .btn-yellow:hover {
+        background: #eab308;
+    }
+
+    .btn-red {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-red:hover {
+        background: #dc2626;
+    }
+
+    /* Responsif */
+    @media (max-width: 768px) {
+        .container-custom {
+            padding: 1rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="container-custom mx-auto w-full overflow-hidden">
     <h1 class="text-center text-2xl font-bold mb-4">Product List</h1>
 
     <!-- Kolom input pencarian -->
@@ -12,16 +126,15 @@
 
     @if (Auth::user()->role === 'admin')
     <!-- Tombol untuk menambah produk hanya untuk admin -->
-    <a href="{{ route('products.create') }}" class="bg-green-500 text-white px-4 py-2 rounded mb-3 inline-block">Add
-        Product</a>
+    <a href="{{ route('products.create') }}" class="btn btn-green mb-3 inline-block">Add Product</a>
     @endif
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @foreach ($products as $product)
-        <div class="bg-white p-4 rounded shadow max-w-full">
+        <div class="product-card p-4 animate-fade-in">
             <!-- Menampilkan gambar produk -->
             @if($product->image_path)
-            <div class="w-64 h-64 overflow-hidden rounded-lg">
+            <div class="product-image w-64 h-64 overflow-hidden rounded-lg">
                 <img src="{{ asset('storage/images/' . $product->image_path) }}" class="w-full h-full object-cover"
                     alt="Product Image">
             </div>
@@ -45,13 +158,12 @@
 
                 @if (Auth::user()->role === 'admin')
                 <div class="flex space-x-2 mt-2">
-                    <a href="{{ route('products.edit', $product->id) }}"
-                        class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a>
+                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-yellow">Edit</a>
                     <form action="{{ route('products.destroy', $product->id) }}" method="POST"
                         onsubmit="return confirm('Are you sure you want to delete this product?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                        <button type="submit" class="btn btn-red">Delete</button>
                     </form>
                 </div>
                 @endif

@@ -7,80 +7,156 @@
     <title>Invoice #{{ $transaction->id }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Hide buttons when printing */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .invoice-container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ddd;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .invoice-header,
+        .invoice-footer {
+            text-align: center;
+        }
+
+        .invoice-info {
+            border-top: 2px solid #333;
+            padding-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .info-item span {
+            font-weight: bold;
+            color: #222;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f1f1;
+        }
+
         @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            .invoice-container {
+                box-shadow: none;
+                border: none;
+                padding: 10px;
+                max-width: 100%;
+            }
+
             .no-print {
                 display: none;
+            }
+
+            @page {
+                margin: 10mm;
             }
         }
     </style>
 </head>
 
-<body class="bg-gray-100 p-6">
-    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <!-- Invoice Header -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Invoice</h1>
-                <p class="text-gray-500">Transaction ID: #{{ $transaction->id }}</p>
-                <p class="text-gray-500">Date: {{ $transaction->created_at->format('d-m-Y H:i') }}</p>
-            </div>
-            <div>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg" alt="Company Logo"
-                    class="w-24">
-            </div>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Invoice</h1>
+            <p>Transaction ID: #{{ $transaction->id }}</p>
+            <p>Date: {{ $transaction->created_at->format('d-m-Y H:i') }}</p>
+            <p class="text-lg font-semibold">
+                {{ strtoupper(auth()->user()->name) }} - {{ strtoupper(auth()->user()->role) }}
+            </p>
+
         </div>
 
-        <!-- Product Details -->
-        <h3 class="text-lg font-semibold mt-6 mb-2">Product Details</h3>
-        <table class="w-full border-collapse border border-gray-300">
+        <h3 class="text-lg font-semibold">Product Details</h3>
+        @if ($items->isNotEmpty())
+        <table class="w-full border-collapse">
             <thead>
-                <tr class="bg-gray-800 text-white">
-                    <th class="border border-gray-300 px-4 py-2 text-left">Product</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">Size</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">Price</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">Qty</th>
-                    <th class="border border-gray-300 px-4 py-2 text-left">Subtotal</th>
+                <tr>
+                    <th class="text-center border px-4 py-2">Product</th>
+                    <th class="text-center border px-4 py-2">Size</th>
+                    <th class="text-center border px-4 py-2">Quantity</th>
+                    <th class="text-center border px-4 py-2">Price</th>
+                    <th class="text-center border px-4 py-2">Total Price</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($items as $item)
-                <tr class="bg-gray-50">
-                    <td class="border border-gray-300 px-4 py-2">{{ $item->product->name }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $item->productSize->size }}</td>
-                    <td class="border border-gray-300 px-4 py-2">Rp{{ number_format($item->product->price, 0, ',', '.')
-                        }}</td>
-                    <td class="border border-gray-300 px-4 py-2 text-center">{{ $item->quantity }}</td>
-                    <td class="border border-gray-300 px-4 py-2">Rp{{ number_format($item->product->price *
-                        $item->quantity, 0, ',', '.') }}</td>
+                <tr>
+                    <td class="text-center border px-4 py-2">{{ $item->product_name }}</td>
+                    <td class="text-center border px-4 py-2">{{ $item->product_size }}</td>
+                    <td class="text-center border px-4 py-2">{{ $item->quantity }}</td>
+                    <td class="text-center border px-4 py-2">Rp {{ number_format($item->product_price, 0, ',', '.') }}
+                    </td>
+                    <td class="text-center border px-4 py-2">Rp {{ number_format($item->product_price * $item->quantity,
+                        0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <!-- Summary -->
-        <div class="bg-gray-50 p-4 rounded-lg text-right mt-4">
-            <p class="text-lg font-semibold text-gray-700">Total Price: <span class="text-gray-900">Rp{{
-                    number_format($transaction->total_price, 0, ',', '.') }}</span></p>
-            <p class="text-lg font-semibold text-gray-700">Customer Payment: <span class="text-gray-900">Rp{{
-                    number_format($transaction->user_money, 0, ',', '.') }}</span></p>
-            <p class="text-lg font-semibold text-green-600">Change: <span class="text-gray-900">Rp{{
-                    number_format($transaction->user_money - $transaction->total_price, 0, ',', '.') }}</span></p>
+        @else
+        <p>No items found in this transaction.</p>
+        @endif
+
+        <div class="invoice-info">
+            <p>Total Price: <strong>Rp {{ number_format($transaction->total_price, 0, ',', '.') }}</strong></p>
+            <p>Customer Payment: <strong>Rp {{ number_format($transaction->user_money, 0, ',', '.') }}</strong></p>
+            <p>Change: <strong>Rp {{ number_format($transaction->user_money - $transaction->total_price, 0, ',', '.')
+                    }}</strong></p>
         </div>
 
-        <!-- Footer -->
-        <div class="mt-6 text-center text-sm text-gray-500">
+        <div class="invoice-footer">
             <p>Thank you for shopping with us!</p>
-            <p>For support, contact <span class="font-semibold text-gray-700">support@example.com</span></p>
+            <p>For support, contact <strong>firman@gmail.com</strong></p>
         </div>
 
-        <!-- Buttons -->
-        <div class="mt-6 text-center no-print">
-            <button onclick="window.print()"
-                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:outline-none">Print
-                Invoice</button>
-            <a href="{{ route('home') }}"
-                class="bg-gray-500 text-white px-6 py-2 rounded-md ml-4 hover:bg-gray-600">Back to Home</a>
+        <div class="text-center no-print mt-4">
+            <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded-md">Print Invoice</button>
+            <a href="{{ route('home') }}" class="bg-gray-500 text-white px-6 py-2 rounded-md ml-4">Back to Home</a>
         </div>
     </div>
 </body>

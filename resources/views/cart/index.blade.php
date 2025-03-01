@@ -50,7 +50,20 @@
                     <td class="py-3 px-4">{{ $item['name'] }}</td>
                     <td class="py-3 px-4">{{ $item['size'] }}</td>
                     <td class="py-3 px-4">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
-                    <td class="py-3 px-4">{{ $item['quantity'] }}</td>
+                    <td class="py-3 px-4">
+                        <form action="{{ route('cart.update', $productId) }}" method="POST"
+                            class="inline-flex items-center space-x-2">
+                            @csrf
+                            <input type="hidden" name="size" value="{{ $sizeId }}">
+                            <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1"
+                                class="border rounded p-1 w-14 text-center text-sm">
+                            <button type="submit"
+                                class="bg-blue-500 text-white py-1 px-3 rounded-lg text-sm hover:bg-blue-600 transition">
+                                Edit
+                            </button>
+                        </form>
+
+                    </td>
                     <td class="py-3 px-4">
                         <form action="{{ url('cart/remove/'.$productId.'/'.$sizeId) }}" method="GET"
                             class="inline-block">
@@ -64,6 +77,7 @@
                 @endforeach
             </tbody>
         </table>
+
     </div>
 
     <!-- Total Belanja -->
