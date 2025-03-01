@@ -24,9 +24,10 @@
                 alt="User Avatar" class="w-12 h-12 rounded-full object-cover bg-gray-600">
 
             <div>
-                <p class="text-lg font-semibold">{{ auth()->user()->name }}</p>
+                <p class="text-lg font-semibold">{{ ucwords(auth()->user()->name) }}</p>
                 <p class="text-sm text-gray-300 capitalize">{{ auth()->user()->role }}</p>
             </div>
+
         </div>
         @endif
 

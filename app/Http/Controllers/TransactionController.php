@@ -130,15 +130,24 @@ class TransactionController extends Controller
     }
 
     // Menampilkan struk pembayaran transaksi
+
     public function showReceipt($transactionId)
     {
-        // Ambil transaksi berdasarkan ID dan relasi dengan item transaksi serta produk
-        $transaction = Transaction::with('transactionItems.product', 'transactionItems.productSize')->findOrFail($transactionId);
+        $transaction = Transaction::with('products')->findOrFail($transactionId);
 
-        // Ambil produk yang ada dalam transaksi
-        $items = $transaction->transactionItems;
+        // Ambil data dari pivot table dengan harga asli dari tabel products
+        $items = DB::table('transaction_product')
+            ->join('products', 'transaction_product.product_id', '=', 'products.id')
+            ->join('product_sizes', 'transaction_product.product_size_id', '=', 'product_sizes.id')
+            ->where('transaction_product.transaction_id', $transactionId)
+            ->select(
+                'products.name as product_name',
+                'products.price as product_price', // Ambil harga asli dari tabel products
+                'product_sizes.size as product_size',
+                'transaction_product.quantity'
+            )
+            ->get();
 
-        // Kirimkan data transaksi dan item ke view
         return view('transactions.receipt', compact('transaction', 'items'));
     }
 }

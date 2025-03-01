@@ -28,11 +28,15 @@ Route::get('/home', function () {
 // Route di web.php
 
 
+// Route::post('/cart/update/{productId}/{sizeId}', [CartController::class, 'update']);
+Route::post('/cart/update/{productId}', [CartController::class, 'update'])->name('cart.update');
+
 
 Route::get('/import-excel', [ImportController::class, 'showImportForm'])->name('import.form');
 Route::post('/import-excel', [ImportController::class, 'import'])->name('import.excel');
 
 Route::get('/sales/export', [SalesReportController::class, 'export'])->name('sales.export');
+Route::post('cart/update/{productId}/{sizeId}', [CartController::class, 'updateQuantity'])->name('cart.update');
 
 Route::post('end-transaction', [TransactionController::class, 'endTransaction'])->name('end.transaction');
 Route::get('/cart/remove/{productId}/{sizeId}', [CartController::class, 'removeItem'])->name('remove.item');
