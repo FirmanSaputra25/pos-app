@@ -20,15 +20,16 @@
         <!-- User Info -->
         @if(auth()->check())
         <div class="mb-6 p-4 bg-gray-700 rounded flex items-center space-x-3">
-            <img src="{{ auth()->user()->profile_photo ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=4A5568&color=ffffff&size=100' }}"
+            <img src="{{ auth()->user()->profile_photo 
+                        ? asset('storage/' . auth()->user()->profile_photo) 
+                        : 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=4A5568&color=ffffff&size=100' }}"
                 alt="User Avatar" class="w-12 h-12 rounded-full object-cover bg-gray-600">
-
             <div>
                 <p class="text-lg font-semibold">{{ ucwords(auth()->user()->name) }}</p>
                 <p class="text-sm text-gray-300 capitalize">{{ auth()->user()->role }}</p>
             </div>
-
         </div>
+
         @endif
 
         <!-- Menu -->
@@ -51,6 +52,12 @@
                     <i data-lucide="credit-card" class="mr-2"></i> Transactions
                 </a>
             </li>
+            <li class="mb-4">
+                <a href="{{ route('cart.index') }}"
+                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('cart.index') ? 'bg-gray-700' : '' }}">
+                    <i data-lucide="shopping-cart" class="mr-2"></i> Cart
+                </a>
+            </li>
             @if(auth()->check() && auth()->user()->role === 'admin')
             <li class="mb-4">
                 <a href="{{ route('sales.report') }}"
@@ -59,12 +66,6 @@
                 </a>
             </li>
             @endif
-            <li class="mb-4">
-                <a href="{{ route('cart.index') }}"
-                    class="flex items-center py-2 px-4 rounded hover:bg-gray-700 {{ request()->routeIs('cart.index') ? 'bg-gray-700' : '' }}">
-                    <i data-lucide="shopping-cart" class="mr-2"></i> Cart
-                </a>
-            </li>
         </ul>
 
         <!-- Auth Buttons -->
